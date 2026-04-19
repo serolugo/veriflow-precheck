@@ -181,26 +181,25 @@ def _finalize(
         print(f"[precheck] netlist.svg skipped (netlistsvg not available)")
 
     # ── datasheet.pdf ─────────────────────────────────────────────────────────
-    from veriflow.generators.datasheet import generate_datasheet_md, convert_md_to_pdf
-    md_path = docs_dir / "datasheet.md"
+    from veriflow.generators.datasheet import generate_datasheet_md, convert_html_to_pdf
+    html_path = docs_dir / "datasheet.html"
     generate_datasheet_md(
         repo_name=repo_name,
         tile_config=tile_config,
-        run_id=run_id,
         run_date=today_str,
         connectivity=conn_result,
         synthesis=synth_result,
         cells=cells,
         status=status,
         commit_sha=commit_sha,
-        output_path=md_path,
+        output_path=html_path,
     )
-    pdf_ok = convert_md_to_pdf(md_path, docs_dir / "datasheet.pdf")
+    pdf_ok = convert_html_to_pdf(html_path, docs_dir / "datasheet.pdf")
     if pdf_ok:
-        md_path.unlink(missing_ok=True)
+        html_path.unlink(missing_ok=True)
         print(f"[precheck] Generated datasheet.pdf")
     else:
-        print(f"[precheck] datasheet.pdf skipped (pandoc not available)")
+        print(f"[precheck] datasheet.pdf skipped (WeasyPrint not available)")
 
     # ── README.md ─────────────────────────────────────────────────────────────
     github_repository = os.environ.get("GITHUB_REPOSITORY", repo_root.name)

@@ -1,5 +1,10 @@
-from datetime import date
 from pathlib import Path
+
+
+def _format_ports(ports_text: str) -> str:
+    """Format ports as a markdown list, one per line."""
+    lines = [l.strip() for l in ports_text.strip().splitlines() if l.strip()]
+    return "\n".join(f"- `{l}`" for l in lines)
 
 
 def generate_readme_ci(
@@ -15,13 +20,11 @@ def generate_readme_ci(
     badge_url: str,
     output_path: Path,
 ) -> None:
-    """
-    Generate the tile README for CI mode.
-    Includes badge, tile info card, netlist SVG, and precheck history table.
-    """
+    """Generate the tile README for CI mode."""
 
     status_emoji = "✅" if status == "PASS" else "❌"
     cells_str = cells if cells else "-"
+    ports_md = _format_ports(tile_config.ports) if tile_config.ports.strip() else "-"
 
     content = f"""# {repo_name}
 
@@ -45,15 +48,18 @@ def generate_readme_ci(
 
 {tile_config.description.strip()}
 
-## Port Convention
+## Ports
 
-{tile_config.ports.strip()}
+{ports_md}
+
+## Usage Guide
+
+{tile_config.usage_guide.strip()}
 
 ## Netlist
 
 ![Netlist](docs/netlist.svg)
 
 📄 [Datasheet](docs/datasheet.pdf)
-
 """
     output_path.write_text(content, encoding="utf-8")
