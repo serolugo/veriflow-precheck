@@ -96,7 +96,6 @@ def convert_md_to_pdf(md_path: Path, pdf_path: Path) -> bool:
     for engine in ["wkhtmltopdf", "pdflatex", "xelatex"]:
         try:
             if engine == "wkhtmltopdf":
-                # pandoc with wkhtmltopdf engine
                 result = subprocess.run(
                     [
                         "pandoc", str(md_path),
@@ -122,6 +121,9 @@ def convert_md_to_pdf(md_path: Path, pdf_path: Path) -> bool:
                 )
             if result.returncode == 0 and pdf_path.exists():
                 return True
+            else:
+                print(f"[precheck] PDF engine {engine} failed: {result.stderr[:200]}")
         except FileNotFoundError:
+            print(f"[precheck] PDF engine {engine} not found")
             continue
     return False

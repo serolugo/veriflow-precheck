@@ -12,7 +12,6 @@ def generate_readme_ci(
     cells: str,
     status: str,
     commit_sha: str,
-    history_rows: list[dict],
     badge_url: str,
     output_path: Path,
 ) -> None:
@@ -23,17 +22,6 @@ def generate_readme_ci(
 
     status_emoji = "✅" if status == "PASS" else "❌"
     cells_str = cells if cells else "-"
-
-    # Build history table rows (newest first)
-    history_md = ""
-    for row in history_rows:
-        e = "✅" if row["status"] == "PASS" else "❌"
-        sha = row.get("commit", "")[:7]
-        history_md += (
-            f"| {row['run']} | {row['date']} | `{sha}` | "
-            f"{row['connectivity']} | {row['synthesis']} | "
-            f"{row.get('cells', '-')} | {e} {row['status']} |\n"
-        )
 
     content = f"""# {repo_name}
 
@@ -67,12 +55,5 @@ def generate_readme_ci(
 
 📄 [Datasheet](docs/datasheet.pdf)
 
----
-
-## Precheck History
-
-| Run | Date | Commit | Connectivity | Synthesis | Cells | Status |
-|-----|------|--------|--------------|-----------|-------|--------|
-{history_md}
 """
     output_path.write_text(content, encoding="utf-8")

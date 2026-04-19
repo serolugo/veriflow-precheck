@@ -217,7 +217,6 @@ def _finalize(
         cells=cells,
         status=status,
         commit_sha=commit_sha,
-        history_rows=[],
         badge_url=badge_url,
         output_path=repo_root / "README.md",
     )

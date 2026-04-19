@@ -41,11 +41,17 @@ write_json {json_path.as_posix()}
             text=True,
         )
         if result2.returncode == 0 and output_path.exists():
-            # Inject white background and centering
             svg = output_path.read_text(encoding="utf-8")
+            # Wrap in HTML for white background and centering
+            # GitHub renders HTML in SVG files correctly
+            wrapped = f"""<div style="background-color:white; padding:16px; text-align:center;">
+{svg}
+</div>"""
+            output_path.with_suffix(".html").write_text(wrapped, encoding="utf-8")
+            # Also write clean SVG with background rect injected
             svg = svg.replace(
                 "<svg ",
-                '<svg style="background-color:white; display:block; margin:auto;" ',
+                '<svg xmlns="http://www.w3.org/2000/svg" style="background:white;" ',
                 1
             )
             output_path.write_text(svg, encoding="utf-8")
