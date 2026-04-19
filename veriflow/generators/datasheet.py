@@ -91,21 +91,37 @@ def convert_md_to_pdf(md_path: Path, pdf_path: Path) -> bool:
     Convert Markdown to PDF using pandoc.
     Returns True if successful.
     """
-    try:
-        result = subprocess.run(
-            [
-                "pandoc",
-                str(md_path),
-                "-o", str(pdf_path),
-                "--pdf-engine=pdflatex",
-                "-V", "geometry:margin=2.5cm",
-                "-V", "fontsize=11pt",
-                "-V", "mainfont=Helvetica",
-                "--highlight-style=tango",
-            ],
-            capture_output=True,
-            text=True,
-        )
-        return result.returncode == 0
-    except FileNotFoundError:
-        return False
+    # Try wkhtmltopdf first (pre-installed on GitHub Actions Ubuntu runners)
+    # Fall back to pdflatex if available
+    for engine in ["wkhtmltopdf", "pdflatex", "xelatex"]:
+        try:
+            if engine == "wkhtmltopdf":
+                # pandoc with wkhtmltopdf engine
+                result = subprocess.run(
+                    [
+                        "pandoc", str(md_path),
+                        "-o", str(pdf_path),
+                        "--pdf-engine=wkhtmltopdf",
+                        "-V", "margin-top=2cm",
+                        "-V", "margin-bottom=2cm",
+                        "-V", "margin-left=2.5cm",
+                        "-V", "margin-right=2.5cm",
+                    ],
+                    capture_output=True, text=True,
+                )
+            else:
+                result = subprocess.run(
+                    [
+                        "pandoc", str(md_path),
+                        "-o", str(pdf_path),
+                        f"--pdf-engine={engine}",
+                        "-V", "geometry:margin=2.5cm",
+                        "-V", "fontsize=11pt",
+                    ],
+                    capture_output=True, text=True,
+                )
+            if result.returncode == 0 and pdf_path.exists():
+                return True
+        except FileNotFoundError:
+            continue
+    return False

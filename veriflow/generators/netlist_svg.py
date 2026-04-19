@@ -41,17 +41,11 @@ write_json {json_path.as_posix()}
             text=True,
         )
         if result2.returncode == 0 and output_path.exists():
-            # Inject white background for readability on dark themes
+            # Inject white background and centering
             svg = output_path.read_text(encoding="utf-8")
             svg = svg.replace(
                 "<svg ",
-                "<svg style=\"background-color:white;\" ",
-                1
-            )
-            # Center the SVG
-            svg = svg.replace(
-                "<svg ",
-                "<svg display=\"block\" margin=\"auto\" ",
+                '<svg style="background-color:white; display:block; margin:auto;" ',
                 1
             )
             output_path.write_text(svg, encoding="utf-8")
