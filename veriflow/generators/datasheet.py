@@ -88,42 +88,49 @@ date: "{run_date}"
 
 def convert_md_to_pdf(md_path: Path, pdf_path: Path) -> bool:
     """
-    Convert Markdown to PDF using pandoc.
+    Convert Markdown to PDF using WeasyPrint.
     Returns True if successful.
     """
-    # Try wkhtmltopdf first (pre-installed on GitHub Actions Ubuntu runners)
-    # Fall back to pdflatex if available
-    for engine in ["wkhtmltopdf", "pdflatex", "xelatex"]:
-        try:
-            if engine == "wkhtmltopdf":
-                result = subprocess.run(
-                    [
-                        "pandoc", str(md_path),
-                        "-o", str(pdf_path),
-                        "--pdf-engine=wkhtmltopdf",
-                        "-V", "margin-top=2cm",
-                        "-V", "margin-bottom=2cm",
-                        "-V", "margin-left=2.5cm",
-                        "-V", "margin-right=2.5cm",
-                    ],
-                    capture_output=True, text=True,
-                )
-            else:
-                result = subprocess.run(
-                    [
-                        "pandoc", str(md_path),
-                        "-o", str(pdf_path),
-                        f"--pdf-engine={engine}",
-                        "-V", "geometry:margin=2.5cm",
-                        "-V", "fontsize=11pt",
-                    ],
-                    capture_output=True, text=True,
-                )
-            if result.returncode == 0 and pdf_path.exists():
-                return True
-            else:
-                print(f"[precheck] PDF engine {engine} failed: {result.stderr[:200]}")
-        except FileNotFoundError:
-            print(f"[precheck] PDF engine {engine} not found")
-            continue
-    return False
+    try:
+        import markdown
+        from weasyprint import HTML, CSS
+
+        md_text = md_path.read_text(encoding="utf-8")
+        html_body = markdown.markdown(md_text, extensions=["tables", "fenced_code"])
+
+        html = f"""<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body {{
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 11pt;
+    margin: 2.5cm;
+    color: #262626;
+    line-height: 1.5;
+  }}
+  h1 {{ font-size: 18pt; border-bottom: 1px solid #999; padding-bottom: 4px; }}
+  h2 {{ font-size: 13pt; margin-top: 1.5em; }}
+  table {{ border-collapse: collapse; width: 100%; margin: 1em 0; }}
+  th {{ background: #ebebeb; padding: 6px 10px; text-align: left; font-size: 10pt; }}
+  td {{ padding: 5px 10px; border-bottom: 1px solid #ddd; font-size: 10pt; }}
+  code {{ background: #f5f5f5; padding: 1px 4px; font-family: monospace; font-size: 10pt; }}
+  pre {{ background: #f5f5f5; padding: 10px; font-size: 9pt; }}
+  hr {{ border: none; border-top: 1px solid #ccc; margin: 1.5em 0; }}
+</style>
+</head>
+<body>
+{html_body}
+</body>
+</html>"""
+
+        HTML(string=html).write_pdf(str(pdf_path))
+        return pdf_path.exists()
+
+    except ImportError as e:
+        print(f"[precheck] WeasyPrint not available: {e}")
+        return False
+    except Exception as e:
+        print(f"[precheck] PDF generation failed: {e}")
+        return False
