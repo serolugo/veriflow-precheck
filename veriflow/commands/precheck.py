@@ -66,7 +66,9 @@ def cmd_precheck(
     logs_dir  = repo_root / "logs"
     run_id    = _get_run_id(run_number)
     today_str = date.today().isoformat()
-    repo_name = repo_root.name
+    # Use GITHUB_REPOSITORY (owner/repo) to get correct repo name in CI
+    github_repo = os.environ.get("GITHUB_REPOSITORY", "")
+    repo_name = github_repo.split("/")[-1] if github_repo else repo_root.name
     tile_id   = repo_name
 
     docs_dir.mkdir(parents=True, exist_ok=True)
