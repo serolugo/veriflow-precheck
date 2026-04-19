@@ -1,6 +1,6 @@
 # veriflow-precheck
 
-CI-adapted variant of [VeriFlow](https://github.com/tu-usuario/veriflow) for SemiCoLab IP tile repositories. Runs connectivity check and synthesis directly from the repo root, generates documentation, and reports results for integration with the SemiCoLab shuttle management system.
+CI-adapted variant of [VeriFlow](https://github.com/serolugo/veriflow) for SemiCoLab IP tile repositories. Runs connectivity check and synthesis directly from the repo root, generates documentation, and reports results for integration with the SemiCoLab shuttle management system.
 
 ---
 
@@ -11,7 +11,7 @@ CI-adapted variant of [VeriFlow](https://github.com/tu-usuario/veriflow) for Sem
 **What it runs:**
 - Connectivity check (Icarus Verilog)
 - Synthesis (Yosys)
-- Simulation is always skipped — use [VeriFlow](https://github.com/tu-usuario/veriflow) locally for functional verification
+- Simulation is always skipped — use [VeriFlow](https://github.com/serolugo/veriflow) locally for functional verification
 
 **What it generates:**
 - `runs/run-NNN/` — manifest, summary, RTL snapshot
@@ -129,5 +129,5 @@ Docker Suite        → TileWizard + VeriFlow in a container
 
 ## Related Repos
 
-- [veriflow](https://github.com/tu-usuario/veriflow) — local verification tool
-- [semicolab-ip-tile-precheck](https://github.com/tu-usuario/semicolab-ip-tile-precheck) — GitHub Actions workflow
+- [veriflow](https://github.com/serolugo/veriflow) — local verification tool
+- [semicolab-ip-tile-precheck](https://github.com/serolugo/semicolab-ip-tile-precheck) — GitHub Actions workflow
