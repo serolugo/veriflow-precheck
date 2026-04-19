@@ -40,7 +40,23 @@ write_json {json_path.as_posix()}
             capture_output=True,
             text=True,
         )
-        return result2.returncode == 0 and output_path.exists()
+        if result2.returncode == 0 and output_path.exists():
+            # Inject white background for readability on dark themes
+            svg = output_path.read_text(encoding="utf-8")
+            svg = svg.replace(
+                "<svg ",
+                "<svg style=\"background-color:white;\" ",
+                1
+            )
+            # Center the SVG
+            svg = svg.replace(
+                "<svg ",
+                "<svg display=\"block\" margin=\"auto\" ",
+                1
+            )
+            output_path.write_text(svg, encoding="utf-8")
+            return True
+        return False
     except FileNotFoundError:
         return False
     finally:

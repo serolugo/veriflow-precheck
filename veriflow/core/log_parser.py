@@ -46,6 +46,11 @@ def parse_synth_log(log_text: str) -> dict:
     matches = re.findall(r"^\s+(\d+) cells\s*$", log_text, re.MULTILINE)
     if matches:
         cells = matches[-1]
+    else:
+        # Fallback: "Number of cells:    3"
+        m = re.search(r"Number of cells:\s*(\d+)", log_text)
+        if m:
+            cells = m.group(1)
 
     # Warnings
     warnings = len(re.findall(r"^\s*Warning:", log_text, re.MULTILINE | re.IGNORECASE))

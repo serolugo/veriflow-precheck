@@ -103,7 +103,8 @@ def cmd_precheck(
     # ── Setup directories ─────────────────────────────────────────────────────
     runs_dir  = repo_root / "runs"
     docs_dir  = repo_root / "docs"
-    run_id    = _get_run_id(runs_dir)
+    # Use GitHub run_number for the run ID — guarantees uniqueness across CI runs
+    run_id    = f"run-{int(run_number):03d}"
     run_dir   = runs_dir / run_id
     today_str = date.today().isoformat()
     repo_name = repo_root.name
@@ -305,8 +306,10 @@ def _finalize(
 
     # ── README.md ─────────────────────────────────────────────────────────────
     records = _read_records(docs_dir / "records.csv")
+    # Badge URL requires owner/repo format — passed via env var in CI
+    github_repository = os.environ.get("GITHUB_REPOSITORY", repo_root.name)
     badge_url = (
-        f"https://github.com/{repo_root.name}/"
+        f"https://github.com/{github_repository}/"
         f"actions/workflows/precheck.yml/badge.svg"
     )
     from veriflow.generators.readme_ci import generate_readme_ci

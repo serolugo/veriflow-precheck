@@ -37,7 +37,7 @@ def generate_readme_ci(
 
     content = f"""# {repo_name}
 
-![Precheck]({badge_url})
+![Precheck Status]({badge_url})
 
 ---
 
