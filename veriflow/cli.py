@@ -80,9 +80,23 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    db = Path(args.db)
+    db = Path(args.db) if args.db else None
 
     try:
+        if args.command == "precheck":
+            from veriflow.commands.precheck import cmd_precheck
+            cmd_precheck(
+                repo_root=Path(args.repo).resolve(),
+                run_number=args.run_number,
+                commit_sha=args.commit,
+                commit_author=args.author,
+            )
+            return 0
+
+        if db is None:
+            print("[ERROR] --db is required for this command", file=__import__("sys").stderr)
+            return 1
+
         if args.command == "init":
             from veriflow.commands.init_db import cmd_init
             cmd_init(db, force=args.force)
@@ -116,15 +130,6 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "bump-revision":
             from veriflow.commands.bump_revision import cmd_bump_revision
             cmd_bump_revision(db, tile_number=args.tile)
-
-        elif args.command == "precheck":
-            from veriflow.commands.precheck import cmd_precheck
-            cmd_precheck(
-                repo_root=Path(args.repo).resolve(),
-                run_number=args.run_number,
-                commit_sha=args.commit,
-                commit_author=args.author,
-            )
 
     except VeriFlowError as e:
         print(f"[ERROR] {e}", file=sys.stderr)
