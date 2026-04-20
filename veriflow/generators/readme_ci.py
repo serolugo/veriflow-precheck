@@ -63,7 +63,6 @@ def generate_readme_ci(
 
 ![Precheck Status]({badge_url})
 ![Cells](https://img.shields.io/badge/Cells-{cells_str}-blue)
-![Status](https://img.shields.io/badge/Status-{status}-{'brightgreen' if status == 'PASS' else 'red'})
 
 ---
 
