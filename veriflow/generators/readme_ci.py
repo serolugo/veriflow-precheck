@@ -59,13 +59,31 @@ def generate_readme_ci(
     usage_lines = tile_config.usage_guide.strip().splitlines()
     usage_md = "  \n".join(usage_lines)
 
+    # Build failure summary if needed
+    fail_section = ""
+    if status == "FAIL":
+        fail_details = []
+        if connectivity == "FAIL":
+            fail_details.append("- **Connectivity check failed** — verify port names and connections match the SemiCoLab convention")
+            fail_details.append("  See `logs/connectivity.log` for details")
+        if synthesis == "FAIL":
+            fail_details.append("- **Synthesis failed** — check for unsupported constructs or inferred latches")
+            fail_details.append("  See `logs/synth.log` for details")
+        fail_section = f"""
+> ❌ **Precheck failed.** Fix the issues below and push again.
+>
+{chr(10).join(f"> {l}" for l in fail_details)}
+
+"""
+
+    cells_badge = f"![Cells](https://img.shields.io/badge/Cells-{cells_str}-blue)" if cells_str != "-" else ""
+
     content = f"""# {repo_name}
 
-![Precheck Status]({badge_url})
-![Cells](https://img.shields.io/badge/Cells-{cells_str}-blue)
+![Precheck Status]({badge_url}) {cells_badge}
 
 ---
-
+{fail_section}
 **{tile_config.tile_name}** · {tile_config.tile_author} · `{tile_config.top_module}` · Shuttle: {shuttle_str}
 
 {tile_config.description.strip()}

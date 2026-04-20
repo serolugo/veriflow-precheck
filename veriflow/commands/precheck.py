@@ -108,14 +108,14 @@ def cmd_precheck(
     print(f"[precheck] Connectivity: {conn_result}")
 
     if conn_result == "FAIL":
-        print(f"[precheck] Connectivity FAILED — stopping")
+        print(f"[precheck] Connectivity FAILED — generating report and stopping")
         _finalize(
             repo_root=repo_root, docs_dir=docs_dir,
             run_id=run_id, today_str=today_str,
             tile_id=tile_id, repo_name=repo_name, tile_config=tile_config,
-            conn_result=conn_result, synth_result=synth_result,
-            synth_parsed=synth_parsed, commit_sha=commit_sha,
-            commit_author=commit_author, rtl_files=rtl_files,
+            conn_result=conn_result, synth_result="SKIPPED",
+            synth_parsed={"cells": "", "warnings": "0", "errors": "0", "has_latches": False},
+            commit_sha=commit_sha, commit_author=commit_author, rtl_files=rtl_files,
         )
         raise VeriFlowError("Precheck FAILED — connectivity check did not pass")
 
